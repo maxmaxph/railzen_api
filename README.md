@@ -24,7 +24,7 @@
 
  Guide de Configuration
 
-Étape 1 : Création de la BDD RZDB
+**Étape 1 : Création de la BDD RZDB**
 
 ```sql
 CREATE DATABASE rzdb;
@@ -76,7 +76,7 @@ CREATE TABLE "rz_favorite"(
 );
 ```
 
-Étape 3: Création de l’API sur VSCode
+**Étape 3: Création de l’API sur VSCode**
 Création du dossier de l’APP : RAILZEN_APP
 Ouvrir ce dossier sur VSCode via git bash:
 
@@ -126,4 +126,24 @@ npm i --save class-validator class-transformer
 Installe le module @nestjs/swagger pour NestJS.
 ```bash
 npm i --save @nestjs/swagger
+```
+**Étape 4 : Création du fichier .env (et .env.template)**
+A la source du projet creation d'un .env pour définir les détails de connexion à votre base de données PostgreSQL.
+```sql
+POSTGRES_HOST=
+POSTGRES_PORT=
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DATABASE=
+PORT=
+MODE=
+JWT_SECRET=
+```
+Ne pas oublier de l'indiquer dans le .gitignore
+
+** Étape 5 : Je push mon projet vers un repo github **
+```bash
+git remote add origin https://github.com/maxmaxph/railzen_api.git
+git branch -M main
+git push -u origin main
 ```
