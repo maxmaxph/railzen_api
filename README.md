@@ -212,4 +212,8 @@ nest generate res categories
  ```
  les opérations de CRUD vont etre générés automatiquements pour chaques ressources.  
  **Étape 8 : ajustement des entities**  
-  
+  création des différentes entitées coreespondant aux diferentes tables et colonnes de la bdd ainsi que les relations et ajout à l'app.module.ts
+
+  ```javascript
+  entities: [Session, Role, User, Favorite, Category],
+  ```
