@@ -30,6 +30,9 @@ export class User {
   @Column({ type: 'timestamp', nullable: false })
   date_in: Date;
 
+  @Column({ type: 'int', nullable: false })
+  role_id: number;
+
   @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
   role: Role;
