@@ -30,7 +30,7 @@
 CREATE DATABASE rzdb;
 ```
 
-Étape 2: Création des tables
+**Étape 2: Création des tables**
 
 ```sql
 CREATE TABLE "rz_role" (
@@ -76,9 +76,9 @@ CREATE TABLE "rz_favorite"(
 );
 ```
 
-**Étape 3: Création de l’API sur VSCode**
-Création du dossier de l’APP : RAILZEN_APP
-Ouvrir ce dossier sur VSCode via git bash:
+**Étape 3: Création de l’API sur VSCode**  
+Création du dossier de l’APP : RAILZEN_APP  
+Ouvrir ce dossier sur VSCode via git bash:  
 
 ```bash
 code .
@@ -127,7 +127,7 @@ Installe le module @nestjs/swagger pour NestJS.
 ```bash
 npm i --save @nestjs/swagger
 ```
-**Étape 4 : Création du fichier .env (et .env.template)**
+**Étape 4 : Création du fichier .env (et .env.template)**  
 A la source du projet creation d'un .env pour définir les détails de connexion à votre base de données PostgreSQL.
 ```sql
 POSTGRES_HOST=
@@ -141,9 +141,75 @@ JWT_SECRET=
 ```
 Ne pas oublier de l'indiquer dans le .gitignore
 
-** Étape 5 : Je push mon projet vers un repo github **
+**Étape 5 : Je push mon projet vers un repo github**  
 ```bash
 git remote add origin https://github.com/maxmaxph/railzen_api.git
 git branch -M main
 git push -u origin main
 ```
+**Étape 6 : configuration prefixe des routes, validationpipe, swagger & cors**    
+app.module.ts
+```javascript
+@Module({
+  imports: [
+    // Importe le module de configuration pour gérer les variables d'environnement
+    ConfigModule.forRoot({ envFilePath: [`.env`] }),
+
+    // Importe le module TypeORM pour la connexion à la base de données
+    TypeOrmModule.forRoot({
+      type: 'postgres', // Spécifie le type de base de données (PostgreSQL)
+      host: 'localhost', // Adresse de l'hôte de la base de données
+      port: +process.env.POSTGRES_PORT, // Port de la base de données (converti en nombre)
+      username: process.env.POSTGRES_USER, // Nom d'utilisateur pour la connexion à la base de données
+      password: process.env.POSTGRES_PASSWORD, // Mot de passe pour la connexion à la base de données
+      database: process.env.POSTGRES_DATABASE, // Nom de la base de données
+      synchronize: false, // Désactive la synchronisation automatique du schéma de la base de données
+    }),
+  ],
+  ```
+  main.ts
+  ```javascript
+  async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Définit un préfixe global pour toutes les routes de l'API
+  app.setGlobalPrefix(`api`);
+
+  // Utilise un pipe global pour valider les données entrantes selon les décorateurs de classe DTO
+  app.useGlobalPipes(new ValidationPipe());
+
+  // Active CORS pour permettre aux requêtes de différents domaines d'accéder à l'API
+  app.enableCors();
+
+  // Configuration module Swagger (doc API)
+  const config = new DocumentBuilder()
+    .setTitle('RAIL ZEN API') // Titre de la documentation
+    .setDescription('Meditation pour les cheminots de la SNCF') // Description de l'API
+    .setVersion('1.0') // Version de l'API
+    .addTag('railzen') // Ajoute une étiquette pour regrouper les routes/endpoints
+    .build();
+
+  // Crée un document Swagger basé sur les configurations et l'application NestJS
+  const document = SwaggerModule.createDocument(app, config);
+
+  // Configure l'application pour utiliser Swagger sur le chemin '/api'
+  SwaggerModule.setup('api', app, document);
+
+  // Démarre l'application pour écouter sur le port 3000
+  await app.listen(3000);
+}
+
+bootstrap();
+```  
+**Étape 7 : Creation et gestion des ressources**  
+j'utiliserai le pluriel de mes noms de tables (convention courante en RESTful API design)
+```bash
+nest generate res users
+nest generate res roles
+nest generate res sessions
+nest generate res favorites
+nest generate res categories
+ ```
+ les opérations de CRUD vont etre générés automatiquements pour chaques ressources.  
+ **Étape 8 : ajustement des entities**  
+  
