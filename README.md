@@ -22,7 +22,7 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nestbacker)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nestsponsor)-->
 
- Guide de Configuration
+Guide de Configuration
 
 **Étape 1 : Création de la BDD RZDB**
 
@@ -78,7 +78,7 @@ CREATE TABLE "rz_favorite"(
 
 **Étape 3: Création de l’API sur VSCode**  
 Création du dossier de l’APP : RAILZEN_APP  
-Ouvrir ce dossier sur VSCode via git bash:  
+Ouvrir ce dossier sur VSCode via git bash:
 
 ```bash
 code .
@@ -86,12 +86,14 @@ code .
 
 Ouvrir un terminal et saisir les commandes :
 
-
 initialisation du projet nest
+
 ```bash
 nest new railzen_api
 ```
+
 Initialisation de git
+
 ```bash
 git init
 ```
@@ -99,36 +101,50 @@ git init
 ```bash
 cd railzen_api
 ```
- premier commit initialisation
+
+premier commit initialisation
+
 ```bash
 git add . && git commit -m"0-Initialisation du projet"
 ```
- Initialise un nouveau dépôt Git dans le répertoire actuel,
+
+Initialise un nouveau dépôt Git dans le répertoire actuel,
 nodemon : Redémarre automatiquement le serveur lors de modifications du code.
 ts-node : Exécute directement le code TypeScript sans transpilation préalable.
 typescript : Le compilateur pour transpiler le code TypeScript en JavaScript.
 @types/express : Fournit des définitions de types pour utiliser Express.js avec TypeScript.
+
 ```bash
 npm i -D nodemon ts-node typescript @types/express
 ```
+
 Installation du module @nestjs/config pour NestJS.
+
 ```bash
 npm i --save @nestjs/config
 ```
+
 Installation des trois paquets nécessaires pour intégrer TypeORM avec NestJS et pour travailler avec PostgreSQL.
+
 ```bash
 npm i --save @nestjs/typeorm typeorm pg
 ```
+
 Installe deux paquets pour la validation et la transformation des données basées sur des classes dans une application TypeScript ou NestJS.
+
 ```bash
 npm i --save class-validator class-transformer
 ```
+
 Installe le module @nestjs/swagger pour NestJS.
+
 ```bash
 npm i --save @nestjs/swagger
 ```
+
 **Étape 4 : Création du fichier .env (et .env.template)**  
 A la source du projet creation d'un .env pour définir les détails de connexion à votre base de données PostgreSQL.
+
 ```sql
 POSTGRES_HOST=
 POSTGRES_PORT=
@@ -139,16 +155,20 @@ PORT=
 MODE=
 JWT_SECRET=
 ```
+
 Ne pas oublier de l'indiquer dans le .gitignore
 
-**Étape 5 : Je push mon projet vers un repo github**  
+**Étape 5 : Je push mon projet vers un repo github**
+
 ```bash
 git remote add origin https://github.com/maxmaxph/railzen_api.git
 git branch -M main
 git push -u origin main
 ```
-**Étape 6 : configuration prefixe des routes, validationpipe, swagger & cors**    
+
+**Étape 6 : configuration prefixe des routes, validationpipe, swagger & cors**  
 app.module.ts
+
 ```javascript
 @Module({
   imports: [
@@ -166,10 +186,12 @@ app.module.ts
       synchronize: false, // Désactive la synchronisation automatique du schéma de la base de données
     }),
   ],
-  ```
-  main.ts
-  ```javascript
-  async function bootstrap() {
+```
+
+main.ts
+
+```javascript
+async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Définit un préfixe global pour toutes les routes de l'API
@@ -200,20 +222,58 @@ app.module.ts
 }
 
 bootstrap();
-```  
+```
+
 **Étape 7 : Creation et gestion des ressources**  
 j'utiliserai le pluriel de mes noms de tables (convention courante en RESTful API design)
+
 ```bash
 nest generate res users
 nest generate res roles
 nest generate res sessions
 nest generate res favorites
 nest generate res categories
- ```
- les opérations de CRUD vont etre générés automatiquements pour chaques ressources.  
- **Étape 8 : ajustement des entities**  
-  création des différentes entitées coreespondant aux diferentes tables et colonnes de la bdd ainsi que les relations et ajout à l'app.module.ts
+```
 
-  ```javascript
-  entities: [Session, Role, User, Favorite, Category],
-  ```
+les opérations de CRUD vont etre générés automatiquements pour chaques ressources.  
+**Étape 8 : ajustement des entities**  
+ création des différentes entitées corrspondant aux diferentes tables et colonnes de la bdd ainsi que les relations et ajout à l'app.module.ts
+
+```javascript
+entities: [Session, Role, User, Favorite, Category],
+```
+
+**Étape 9 : creation des create.dto**
+Création des create.dto pour les ressources users, sessions et catégories. Ce sont les seules sur lequelles nous allons appliquer le CRUD
+exemple du creat-user.dto avec ses class-validator(une bibliothèque qui permet de valider des objets en fonction de certaines règles) et decoration pour documenter avec swagger ( indique à Swagger qu’il peut l’inclure et la décrire dans la documentation de l’API).
+```javascript
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+
+export class CreateUserDto {
+  @ApiProperty()
+  @IsString()
+  @MaxLength(50)
+  @IsNotEmpty()
+  first_name: string;
+
+  @ApiProperty()
+  @IsString()
+  @MaxLength(50)
+  @IsNotEmpty()
+  last_name: string;
+
+  @ApiProperty()
+  @IsString()
+  @MaxLength(100)
+  @IsEmail()
+  @IsNotEmpty()
+  mail: string;
+
+  @ApiProperty()
+  @IsString()
+  @MaxLength(60)
+  @IsNotEmpty()
+  password: string;
+}
+``` 
