@@ -8,6 +8,11 @@ import { RolesModule } from './roles/roles.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { CategoriesModule } from './categories/categories.module';
+import { Session } from './sessions/entities/session.entity';
+import { Role } from './roles/entities/role.entity';
+import { User } from './users/entities/user.entity';
+import { Favorite } from './favorites/entities/favorite.entity';
+import { Category } from './categories/entities/category.entity';
 
 @Module({
   imports: [
@@ -23,7 +28,7 @@ import { CategoriesModule } from './categories/categories.module';
       password: process.env.POSTGRES_PASSWORD, // Mot de passe pour la connexion à la base de données
       database: process.env.POSTGRES_DATABASE, // Nom de la base de données
       synchronize: false, // Désactive la synchronisation automatique du schéma de la base de données
-      entities: [],
+      entities: [Session, Role, User, Favorite, Category],
     }),
 
     UsersModule,
