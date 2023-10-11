@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import * as bcrypt from 'bcrypt';
@@ -10,6 +11,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
+import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +22,7 @@ export class AuthService {
     private userRepository: Repository<User>,
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
+    private jwtService: JwtService,
   ) {}
 
   async register(createAuthDto: CreateAuthDto) {
@@ -59,6 +63,26 @@ export class AuthService {
         // Si une autre erreur se produit
         throw new InternalServerErrorException();
       }
+    }
+  }
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
+    // j'inclue le roleId dans le playload de mon token
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['role'],
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    const userId = user.user_id;
+    const roleId = user.role_id; // roleId depuis user entities
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const payload = { email, userId, roleId }; // Ajoute le roleId dans le payload
+      const accessToken = await this.jwtService.sign(payload);
+      return { accessToken };
+    } else {
+      throw new UnauthorizedException('Credentials not found');
     }
   }
 }
