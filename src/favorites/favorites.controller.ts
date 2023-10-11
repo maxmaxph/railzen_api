@@ -6,13 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 @ApiTags('favorites')
 @Controller('favorites')
+@UseGuards(AuthGuard('jwt'))
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
