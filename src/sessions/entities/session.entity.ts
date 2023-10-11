@@ -27,7 +27,7 @@ export class Session {
   @Column({ type: 'varchar', length: 255, nullable: false })
   sound_file: string;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   date_added: Date;
 
   @ManyToOne(() => Category, (category) => category.sessions)

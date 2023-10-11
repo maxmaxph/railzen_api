@@ -74,8 +74,29 @@ CREATE TABLE "rz_favorite"(
     CONSTRAINT fk_rz_favorite_rz_user FOREIGN KEY (user_id) REFERENCES rz_user(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_rz_favorite_rz_session FOREIGN KEY (session_id) REFERENCES rz_session(session_id)
 );
-```
 
+```
+j'ai ensuite inséré des lignes dans mes colones afin d'avoir des données pour effectuer mes tests à posteriori et me suis rendu compte que la valeur NOT NULL sur les date d'inscription et d'ajout de scéance ne me permettait pas d'ajouter de user et sessions sans date.
+
+```sql
+ALTER TABLE rz_user 
+ALTER COLUMN date_in SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE rz_session  
+ALTER COLUMN date_added SET DEFAULT CURRENT_TIMESTAMP; 
+```
+J'ai pu ensuite insérer mes données dans mes tables dans l'ordre suivant
+```sql
+INSERT INTO rz_role (name) VALUES ('user'),('admin');
+
+INSERT INTO rz_user (first_name , last_name, email, "password" , role_id) VALUES ('Lenfant', 'Maxime', 'maxmaxph@gmail.com','azerty', '2'),
+('Lobry', 'Edwige', 'edwigelobry@gmail.com', 'azerty', '1');
+
+INSERT INTO rz_category ("name", description) VALUES ('Stressless', 'sans stress au travail c''est mieux');
+
+INSERT INTO rz_session (title, description, duration, sound_file, category_id, user_id) 
+VALUES ('zen at work', 'se destresser au travail', '01:30:00', 'chemin/vers/fichier_son.mp3', 1, 2);
+``` 
 **Étape 3: Création de l’API sur VSCode**  
 Création du dossier de l’APP : RAILZEN_APP  
 Ouvrir ce dossier sur VSCode via git bash:
@@ -363,3 +384,6 @@ cela m'a permis de me rendre compte que j'avais oublié une propriété "role_id
 @Column({ type: 'int', nullable: false })
 role_id: number;
 ```
+
+**Étape 11 : Test de mes requetes avec Swagger**
+Je peux désormais tester mes requêtes avec swagger qui fournit une interface via l'url locale: http://localhost:3000/api

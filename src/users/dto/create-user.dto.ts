@@ -19,7 +19,7 @@ export class CreateUserDto {
   @MaxLength(100)
   @IsEmail()
   @IsNotEmpty()
-  mail: string;
+  email: string;
 
   @ApiProperty()
   @IsString()

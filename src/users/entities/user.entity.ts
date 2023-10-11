@@ -27,7 +27,7 @@ export class User {
   @Column({ type: 'char', length: 60, nullable: false })
   password: string;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   date_in: Date;
 
   @Column({ type: 'int', nullable: false })
