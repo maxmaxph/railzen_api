@@ -13,6 +13,7 @@ import { Role } from './roles/entities/role.entity';
 import { User } from './users/entities/user.entity';
 import { Favorite } from './favorites/entities/favorite.entity';
 import { Category } from './categories/entities/category.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -40,6 +41,8 @@ import { Category } from './categories/entities/category.entity';
     FavoritesModule,
 
     CategoriesModule,
+
+    AuthModule,
   ],
 
   controllers: [AppController],
