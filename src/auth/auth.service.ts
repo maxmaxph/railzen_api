@@ -23,7 +23,7 @@ export class AuthService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(createAuthDto: CreateAuthDto) {
     const { first_name, last_name, email, password } = createAuthDto;
@@ -67,18 +67,22 @@ export class AuthService {
   }
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
-    // j'inclue le roleId dans le playload de mon token
+
     const user = await this.userRepository.findOne({
       where: { email },
       relations: ['role'],
     });
+
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+
     const userId = user.user_id;
-    const roleId = user.role_id; // roleId depuis user entities
+    const roleId = user.role_id;
+    const roleName = user.role.name; // Récupérez le nom du rôle depuis l'entité User
+
     if (user && (await bcrypt.compare(password, user.password))) {
-      const payload = { email, userId, roleId }; // Ajoute le roleId dans le payload
+      const payload = { email, userId, roleId, roleName }; // Ajoutez le roleName dans le payload
       const accessToken = await this.jwtService.sign(payload);
       return { accessToken };
     } else {

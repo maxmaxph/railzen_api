@@ -76,16 +76,24 @@ CREATE TABLE "rz_favorite"(
 );
 
 ```
+
 j'ai ensuite inséré des lignes dans mes colones afin d'avoir des données pour effectuer mes tests à posteriori et me suis rendu compte que la valeur NOT NULL sur les date d'inscription et d'ajout de scéance ne me permettait pas d'ajouter de user et sessions sans date.
+De plus j'ai ajoute une contrainte d'unicité nommée unique_favorite à la table "rz_favorite" sur les colonnes user_id et session_id.
 
 ```sql
-ALTER TABLE rz_user 
+ALTER TABLE rz_user
 ALTER COLUMN date_in SET DEFAULT CURRENT_TIMESTAMP;
 
-ALTER TABLE rz_session  
-ALTER COLUMN date_added SET DEFAULT CURRENT_TIMESTAMP; 
+ALTER TABLE rz_session
+ALTER COLUMN date_added SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE "rz_favorite"
+ADD CONSTRAINT unique_favorite UNIQUE (user_id, session_id);
+
 ```
+
 J'ai pu ensuite insérer mes données dans mes tables dans l'ordre suivant
+
 ```sql
 INSERT INTO rz_role (name) VALUES ('user'),('admin');
 
@@ -94,9 +102,10 @@ INSERT INTO rz_user (first_name , last_name, email, "password" , role_id) VALUES
 
 INSERT INTO rz_category ("name", description) VALUES ('Stressless', 'sans stress au travail c''est mieux');
 
-INSERT INTO rz_session (title, description, duration, sound_file, category_id, user_id) 
+INSERT INTO rz_session (title, description, duration, sound_file, category_id, user_id)
 VALUES ('zen at work', 'se destresser au travail', '01:30:00', 'chemin/vers/fichier_son.mp3', 1, 2);
-``` 
+```
+
 **Étape 3: Création de l’API sur VSCode**  
 Création du dossier de l’APP : RAILZEN_APP  
 Ouvrir ce dossier sur VSCode via git bash:
@@ -267,6 +276,7 @@ entities: [Session, Role, User, Favorite, Category],
 **Étape 9 : creation des create.dto**
 Création des create.dto pour les ressources users, sessions et catégories. Ce sont les seules sur lequelles nous allons appliquer le CRUD
 exemple du creat-user.dto avec ses class-validator(une bibliothèque qui permet de valider des objets en fonction de certaines règles) et decoration pour documenter avec swagger ( indique à Swagger qu’il peut l’inclure et la décrire dans la documentation de l’API).
+
 ```javascript
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
@@ -297,9 +307,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 }
-``` 
+```
+
 **Étape 10 : creation des methodes du CRUD dans les services des ressources**
 exemple avec le usersService:
+
 ```javascript
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -379,11 +391,251 @@ export class UsersService {
 }
 
 ```
+
 cela m'a permis de me rendre compte que j'avais oublié une propriété "role_id" dans mon entitée User
+
 ```javascript
 @Column({ type: 'int', nullable: false })
 role_id: number;
 ```
 
-**Étape 11 : Test de mes requetes avec Swagger**
-Je peux désormais tester mes requêtes avec swagger qui fournit une interface via l'url locale: http://localhost:3000/api
+**Étape 11 : Test de mes requetes**
+Je peux désormais tester mes requêtes avec swagger qui fournit une interface via l'url locale: http://localhost:3000/api ainsi qu'avec le logiciel Postman.
+
+**Étape 12: gestion de l'autentification et autorisation**
+
+Création du module auth et mise en place ainsi qu'installation de:
+
+- bcrypt pour hasher le mot de passe et ses types.
+- Passeport et JWT pour nestjs
+- le package le package passport-jwt et ses types
+
+```bash
+nest g res auth
+npm i bcrypt
+npm i --save-dev @types/bcrypt
+npm i @nestjs/passport @nestjs/jwt
+npm i passport-jwt
+npm i --save-dev @types/passport-jwt
+```
+
+et codage de authService, authController, et CreateAthDto pour les methodes register et login:
+
+```javascript
+ async register(createAuthDto: CreateAuthDto) {
+    const { first_name, last_name, email, password } = createAuthDto;
+
+    // Génération d'un "salt" pour le hashage du mot de passe
+    const salt = await bcrypt.genSalt();
+    // Hashage du mot de passe avec le "salt"
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Création d'une nouvelle entité User avec les données fournies
+    const user = this.userRepository.create({
+      first_name,
+      last_name,
+      email,
+      password: hashedPassword,
+    });
+    const defaultRole = await this.roleRepository.findOne({
+      where: { name: 'user' },
+    }); // SELECT * FROM role WHERE role = 'user'
+    if (!defaultRole) {
+      throw new NotFoundException('Default role not found');
+    }
+    user.date_in = new Date(); // set date_in
+    user.role_id = defaultRole.role_id; // set default role
+
+    try {
+      // Tentative d'enregistrement du nouvel utilisateur dans la base de données
+      const createdUser = await this.userRepository.save(user);
+      // Suppression du mot de passe du retour pour des raisons de sécurité
+      delete createdUser.password;
+      return createdUser;
+    } catch (error) {
+      // Si l'email existe déjà dans la base de données (erreur 23505)
+      if (error.code === '23505') {
+        throw new ConflictException('email already exists');
+      } else {
+        // Si une autre erreur se produit
+        throw new InternalServerErrorException();
+      }
+    }
+  }
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
+
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['role'],
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const userId = user.user_id;
+    const roleId = user.role_id;
+    const roleName = user.role.name; // Récupérez le nom du rôle depuis l'entité User
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const payload = { email, userId, roleId, roleName }; // Ajoute email, userId, roleId, roleName dans le payload du token
+      const accessToken = await this.jwtService.sign(payload);
+      return { accessToken };
+    } else {
+      throw new UnauthorizedException('Credentials not found');
+    }
+  }
+}
+
+```
+
+ainsi que pour l'autorisation jwt.strategy et son decorateur:
+
+```javascript
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {
+    super({
+      secretOrKey: process.env.JWT_SECRET,
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    });
+  }
+
+  // IMPORTANT IL FAUT GARDER CE NOM DE METHODE
+  async validate(payload: any): Promise<User> {
+    console.log('validate');
+    const { email } = payload;
+
+    // Joignez le rôle lors de la récupération de l'utilisateur
+    const user: User = await this.userRepository.findOne({
+      where: { email },
+      relations: ['role'], // Ajoutez cette ligne pour joindre le rôle
+    });
+
+    if (!user) throw new UnauthorizedException();
+    return user;
+  }
+}
+
+```
+
+```javascript
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { User } from './user.entity';
+
+export const GetUser = createParamDecorator(
+  (_data, ctx: ExecutionContext): User => {
+    const req = ctx.switchToHttp().getRequest();
+    return req.user; // NE PAS RENOMMER
+		// c'est toujours la propriété user de req que l'on retourne
+  },
+);
+```
+
+et pouvoir proteger et gérer l'acces aux methode qu'aux utilisateurs connectés.
+
+**Étape 13: creation d'un roleGuard**
+
+Afin de n'autoriser l'accès à certaines méthode qu'aux user dont le token est valide et dont le role est"admin"
+
+Je génère un roleGard:
+
+```bash
+nest g guard role
+```
+
+Et code la méthode canActivate:
+
+```javascript
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class RoleGuard implements CanActivate {
+  constructor(private readonly roleName: string) {}
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    if (!user) {
+      throw new ForbiddenException("Vous n'êtes pas connecté");
+    }
+
+    // Vérifiez si l'utilisateur a une propriété 'role' et si cette propriété a une sous-propriété 'name'
+    if (!user.role || !user.role.name || user.role.name !== this.roleName) {
+      throw new ForbiddenException("Vous n'avez pas les droits nécessaires");
+    }
+
+    return true;
+  }
+}
+
+```
+
+que j'utlise dans mes controller sur les méthode que je ne veux rendre accessisbles qu'aux admins:  
+exemple sur le userController
+
+```javascript
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/role/role.guard';
+@ApiTags('users')
+@Controller('users')
+@UseGuards(AuthGuard('jwt'), new RoleGuard('admin'))
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(+id, updateUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(+id);
+  }
+}
+
+```
+
+Si je ne suis pas loggé en tant qu'admin, aucune requete n'aboutira.

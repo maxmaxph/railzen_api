@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
-import { CreateFavoriteDto } from './dto/create-favorite.dto';
+
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,9 +19,12 @@ import { AuthGuard } from '@nestjs/passport';
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
-  @Post()
-  create(@Body() createFavoriteDto: CreateFavoriteDto) {
-    return this.favoritesService.create(createFavoriteDto);
+  @Post(':userId/:sessionId')
+  async addToFavorites(
+    @Param('userId') userId: number,
+    @Param('sessionId') sessionId: number,
+  ) {
+    return this.favoritesService.addToFavorites(userId, sessionId);
   }
 
   @Get()
@@ -29,9 +32,9 @@ export class FavoritesController {
     return this.favoritesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favoritesService.findOne(+id);
+  @Get('user/:userId')
+  async findFavoritesByUserId(@Param('userId') userId: number) {
+    return this.favoritesService.findFavoritesByUserId(userId);
   }
 
   @Patch(':id')
@@ -42,8 +45,14 @@ export class FavoritesController {
     return this.favoritesService.update(+id, updateFavoriteDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.favoritesService.remove(+id);
+  @Delete('user/:userId/session/:sessionId')
+  async removeFavoriteByUserIdAndSessionId(
+    @Param('userId') userId: number,
+    @Param('sessionId') sessionId: number,
+  ) {
+    return this.favoritesService.removeFavoriteByUserIdAndSessionId(
+      userId,
+      sessionId,
+    );
   }
 }

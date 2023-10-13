@@ -4,10 +4,10 @@ import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('rz_favorite')
 export class Favorite {
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'user_id' })
   user_id: number;
 
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'session_id' })
   session_id: number;
 
   @ManyToOne(() => User, (user) => user.favorites)

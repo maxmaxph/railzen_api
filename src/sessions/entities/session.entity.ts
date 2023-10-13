@@ -30,6 +30,9 @@ export class Session {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   date_added: Date;
 
+  @Column()
+  category_id: number;
+
   @ManyToOne(() => Category, (category) => category.sessions)
   @JoinColumn({ name: 'category_id' })
   category: Category;

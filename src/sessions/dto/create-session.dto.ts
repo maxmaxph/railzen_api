@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MaxLength, IsNotEmpty, Matches } from 'class-validator';
+import {
+  IsString,
+  MaxLength,
+  IsNotEmpty,
+  Matches,
+  IsNumber,
+} from 'class-validator';
 
 export class CreateSessionDto {
   @ApiProperty()
@@ -27,4 +33,9 @@ export class CreateSessionDto {
   @MaxLength(255)
   @IsNotEmpty()
   sound_file: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  category_id: number;
 }
