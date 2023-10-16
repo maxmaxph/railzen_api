@@ -13,12 +13,13 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from 'src/role/role.guard';
 @ApiTags('roles')
 @Controller('roles')
 @UseGuards(AuthGuard('jwt'))
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
-
+  @UseGuards(new RoleGuard('admin'))
   @Post()
   create(@Body() createRoleDto: CreateRoleDto) {
     return this.rolesService.create(createRoleDto);
@@ -33,12 +34,12 @@ export class RolesController {
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(+id);
   }
-
+  @UseGuards(new RoleGuard('admin'))
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.rolesService.update(+id, updateRoleDto);
   }
-
+  @UseGuards(new RoleGuard('admin'))
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.rolesService.remove(+id);
