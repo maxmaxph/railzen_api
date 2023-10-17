@@ -639,3 +639,5 @@ export class UsersController {
 ```
 
 Si je ne suis pas loggé en tant qu'admin, aucune requete n'aboutira.
+
+**Étape : Installation de Multer pour l'upload de son**

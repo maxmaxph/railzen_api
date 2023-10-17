@@ -14,6 +14,7 @@ import { User } from './users/entities/user.entity';
 import { Favorite } from './favorites/entities/favorite.entity';
 import { Category } from './categories/entities/category.entity';
 import { AuthModule } from './auth/auth.module';
+import { FileStorageService } from './file-storage/file-storage.service';
 
 @Module({
   imports: [
@@ -46,6 +47,6 @@ import { AuthModule } from './auth/auth.module';
   ],
 
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, FileStorageService],
 })
 export class AppModule {}
