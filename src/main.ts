@@ -2,15 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as multer from 'multer';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
-  // Configure multer
-  const storage = multer.memoryStorage(); // Store the file in memory
-  const upload = multer({ storage });
-
-  app.use(upload.any()); // Handle file uploads
 
   // Définit un préfixe global pour toutes les routes de l'API
   app.setGlobalPrefix(`api`);

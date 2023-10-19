@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role } from 'src/roles/entities/role.entity';
 import { User } from './entities/user.entity';
-
+import jwt from 'jsonwebtoken';
 @Injectable() // Decorator indicating that this class is an injectable service
 @Injectable() // Décorateur indiquant que cette classe est un service injectable
 export class UsersService {
@@ -95,5 +95,38 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
     return this.userRepository.remove(userToRemove);
+  }
+
+  async checkToken(token: string) {
+    console.log('je suis dans checkToken : ', token);
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET) as any; // Vérifie le token et le décode
+
+        // Assurez-vous que votre token contient une clé `id` ou similaire avec l'ID de l'utilisateur
+        const userId = decodedToken.userId;
+
+        if (!userId) {
+          reject("Le token ne contient pas d'ID utilisateur");
+          return;
+        }
+
+        const user = await this.findOne(userId);
+        if (!user) {
+          reject("Le compte n'existe pas");
+          return;
+        }
+
+        resolve(true); // Le token est valide et l'utilisateur n'est pas supprimé
+      } catch (error) {
+        if (error instanceof jwt.TokenExpiredError) {
+          // Si le token a expiré
+          reject('Token has expired');
+        } else {
+          reject('Token is invalid'); // Le token est invalide pour une autre raison
+        }
+      }
+    });
   }
 }

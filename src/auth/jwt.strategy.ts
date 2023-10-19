@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // Joignez le rôle lors de la récupération de l'utilisateur
     const user: User = await this.userRepository.findOne({
       where: { email },
-      relations: ['role'], // Ajoutez cette ligne pour joindre le rôle
+      relations: ['role'], // ligne pour joindre le rôle
     });
 
     if (!user) throw new UnauthorizedException();
