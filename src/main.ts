@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,6 +30,13 @@ async function bootstrap() {
   // Configure l'application pour utiliser Swagger sur le chemin '/api'
   SwaggerModule.setup('api', app, document);
 
+  const corsOptions: CorsOptions = {
+    origin: 'http://localhost:4200',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true,
+  };
+  app.enableCors(corsOptions);
   // Démarre l'application pour écouter sur le port 3000
   await app.listen(3000);
 }

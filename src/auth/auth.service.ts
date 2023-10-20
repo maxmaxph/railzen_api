@@ -23,7 +23,7 @@ export class AuthService {
     @InjectRepository(Role)
     private roleRepository: Repository<Role>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async register(createAuthDto: CreateAuthDto) {
     const { first_name, last_name, email, password } = createAuthDto;

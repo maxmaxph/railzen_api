@@ -14,6 +14,8 @@ import { User } from './users/entities/user.entity';
 import { Favorite } from './favorites/entities/favorite.entity';
 import { Category } from './categories/entities/category.entity';
 import { AuthModule } from './auth/auth.module';
+import { MediasModule } from './medias/medias.module';
+import { Media } from './medias/entities/media.entity';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { AuthModule } from './auth/auth.module';
       password: process.env.POSTGRES_PASSWORD, // Mot de passe pour la connexion à la base de données
       database: process.env.POSTGRES_DATABASE, // Nom de la base de données
       synchronize: false, // Désactive la synchronisation automatique du schéma de la base de données
-      entities: [Session, Role, User, Favorite, Category],
+      entities: [Session, Role, User, Favorite, Category, Media],
     }),
 
     UsersModule,
@@ -43,6 +45,8 @@ import { AuthModule } from './auth/auth.module';
     CategoriesModule,
 
     AuthModule,
+
+    MediasModule,
   ],
 
   controllers: [AppController],

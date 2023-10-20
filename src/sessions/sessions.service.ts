@@ -6,7 +6,7 @@ import { Category } from 'src/categories/entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-@Injectable() // Decorator indicating that this class is an injectable service
+// Decorator indicating that this class is an injectable service
 @Injectable() // Décorateur indiquant que cette classe est un service injectable
 export class SessionsService {
   // Injection of repositories for Session and Category entities
@@ -18,13 +18,11 @@ export class SessionsService {
     private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  // Asynchronous method to create a new session
   // Méthode asynchrone pour créer une nouvelle session
   async create(createSessionDto: CreateSessionDto, user: any) {
     const session = new Session();
     Object.assign(session, createSessionDto);
-    session.user = user; // Associate the admin to the session
-    // Associez l'administrateur à la session
+    session.user = user; // Associez l'administrateur à la session
     return this.sessionRepository.save(session);
   }
 

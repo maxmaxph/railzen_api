@@ -1,5 +1,6 @@
 import { Category } from 'src/categories/entities/category.entity';
 import { Favorite } from 'src/favorites/entities/favorite.entity';
+import { Media } from 'src/medias/entities/media.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -7,6 +8,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -22,16 +24,14 @@ export class Session {
   description: string;
 
   @Column({ type: 'time', nullable: false })
-  duration: Date;
-
-  @Column({ type: 'varchar', length: 255, nullable: false })
-  sound_file: string;
+  duration: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   date_added: Date;
 
-  @Column()
-  category_id: number;
+  @OneToOne(() => Media, { eager: true })
+  @JoinColumn({ name: 'media_id' })
+  media_id: Media;
 
   @ManyToOne(() => Category, (category) => category.sessions)
   @JoinColumn({ name: 'category_id' })
