@@ -29,13 +29,17 @@ export class CreateSessionDto {
   duration: string;
 
   @ApiProperty()
-  @IsString()
-  @MaxLength(255)
+  @IsNumber()
   @IsNotEmpty()
-  sound_file: string;
+  media_id: number;
 
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
   category_id: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsNotEmpty()
+  user_id: number;
 }

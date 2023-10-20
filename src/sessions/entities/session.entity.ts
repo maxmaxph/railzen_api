@@ -33,7 +33,7 @@ export class Session {
   @JoinColumn({ name: 'media_id' })
   media_id: Media;
 
-  @ManyToOne(() => Category, (category) => category.sessions)
+  @ManyToOne(() => Category, (category) => category.sessions, { eager: true })
   @JoinColumn({ name: 'category_id' })
   category: Category;
 

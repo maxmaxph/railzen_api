@@ -22,7 +22,13 @@ export class SessionsService {
   async create(createSessionDto: CreateSessionDto, user: any) {
     const session = new Session();
     Object.assign(session, createSessionDto);
-    session.user = user; // Associez l'administrateur à la session
+    session.user = user;
+
+    // Créer une référence à une entité Category sans la charger depuis la base de données
+    session.category = this.categoryRepository.create({
+      category_id: createSessionDto.category_id,
+    });
+
     return this.sessionRepository.save(session);
   }
 
