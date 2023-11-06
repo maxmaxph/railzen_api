@@ -13,7 +13,7 @@ import {
 import { MediasService } from './medias.service';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-
+import { Media } from './entities/media.entity';
 @Controller('medias')
 export class MediasController {
   constructor(private readonly mediasService: MediasService) {}
@@ -33,8 +33,8 @@ export class MediasController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  async getMedia(@Res({ passthrough: true }) res): Promise<StreamableFile> {
-    return this.mediasService.getMedia(res);
+  async getAllMedia(): Promise<Media[]> {
+    return this.mediasService.getAllMedia();
   }
 
   @Get(':id')

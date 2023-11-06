@@ -20,22 +20,8 @@ export class MediasService {
     });
   }
 
-  async getMedia(res): Promise<StreamableFile> {
-    const result = await this.mediaRepository.find();
-    console.log(result);
-    let mediaFile;
-    const mediaTab = [];
-    // const lastResult = result[result.length - 1];
-    // console.log(lastResult);
-    for (let i = 0; i < result.length; i++) {
-      mediaFile = createReadStream(
-        join(process.cwd(), 'uploads', result[i].name),
-      );
-      res.set('Content-Type', result[i].mimetype);
-      mediaTab.push(mediaFile);
-    }
-    console.log(mediaTab[mediaFile]);
-    return new StreamableFile(mediaFile);
+  async getAllMedia(): Promise<Media[]> {
+    return this.mediaRepository.find();
   }
 
   async getMediaById(id: number, res): Promise<StreamableFile> {
