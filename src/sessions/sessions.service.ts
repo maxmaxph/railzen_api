@@ -49,7 +49,20 @@ export class SessionsService {
     }
     return found;
   }
-
+  // Asynchronous method to find sessions by her categories
+  // Méthode asynchrone pour trouver les sessions par leurs catégories
+  async findSessionsByCategory(categoryId: number) {
+    const category = await this.categoryRepository.findOneBy({
+      category_id: categoryId,
+    });
+    if (!category) {
+      throw new NotFoundException(`Category #${categoryId} not found`);
+    }
+    return this.sessionRepository.find({
+      where: { category: category },
+      relations: ['category'],
+    });
+  }
   // Asynchronous method to update a session by its ID
   // Méthode asynchrone pour mettre à jour une session par son ID
   async update(id: number, updateSessionDto: UpdateSessionDto) {

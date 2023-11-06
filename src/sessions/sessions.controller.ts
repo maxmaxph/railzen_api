@@ -36,6 +36,11 @@ export class SessionsController {
   findOne(@Param('id') id: string) {
     return this.sessionsService.findOne(+id);
   }
+
+  @Get('/category/:categoryId')
+  getSessionsByCategory(@Param('categoryId') categoryId: number) {
+    return this.sessionsService.findSessionsByCategory(categoryId);
+  }
   @UseGuards(new RoleGuard('admin'))
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateSessionDto: UpdateSessionDto) {

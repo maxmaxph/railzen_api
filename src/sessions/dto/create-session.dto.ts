@@ -6,6 +6,7 @@ import {
   Matches,
   IsNumber,
 } from 'class-validator';
+import { Media } from 'src/medias/entities/media.entity';
 
 export class CreateSessionDto {
   @ApiProperty()
@@ -29,9 +30,8 @@ export class CreateSessionDto {
   duration: string;
 
   @ApiProperty()
-  @IsNumber()
   @IsNotEmpty()
-  media_id: number;
+  media_id: Media;
 
   @ApiProperty()
   @IsNumber()
