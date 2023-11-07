@@ -82,9 +82,34 @@ export class UsersService {
   // Asynchronous method to update a user by its ID
   // Méthode asynchrone pour mettre à jour un utilisateur par son ID
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const userToUpdate = await this.findOne(id);
+    const userToUpdate = await this.userRepository.findOne({
+      where: { user_id: id },
+      relations: ['role'],
+    });
+
+    if (!userToUpdate) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
     Object.assign(userToUpdate, updateUserDto);
-    return this.userRepository.save(userToUpdate);
+
+    // Si un role_id est fourni, mettez à jour l'objet role associé
+    if (updateUserDto.role_id) {
+      const newRole = await this.roleRepository.findOneBy({
+        role_id: updateUserDto.role_id,
+      });
+      if (newRole) {
+        userToUpdate.role = newRole;
+      } else {
+        throw new NotFoundException(
+          `Role with id ${updateUserDto.role_id} not found`,
+        );
+      }
+    }
+
+    await this.userRepository.save(userToUpdate);
+
+    return userToUpdate;
   }
 
   // Asynchronous method to remove a user by its ID

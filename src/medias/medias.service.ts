@@ -33,7 +33,7 @@ export class MediasService {
       join(process.cwd(), 'uploads', result.name),
     );
     res.set('Content-Type', result.mimetype);
-    console.log('mon media', mediaFile);
+
     return new StreamableFile(mediaFile);
   }
 
