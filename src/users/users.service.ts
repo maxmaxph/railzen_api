@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Role } from 'src/roles/entities/role.entity';
 import { User } from './entities/user.entity';
 import jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 @Injectable() // Decorator indicating that this class is an injectable service
 @Injectable() // Décorateur indiquant que cette classe est un service injectable
 export class UsersService {
@@ -14,6 +15,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
+    private jwtService: JwtService,
   ) {}
 
   // Asynchronous method to create a new user
@@ -46,10 +48,19 @@ export class UsersService {
     // Save the new user in the database
     // Sauvegarde le nouvel utilisateur dans la base de données
     const user = await this.userRepository.save(newUser);
+    // Create a payload for the JWT token
+    const payload = {
+      email: user.email,
+      userId: user.user_id,
+      roleId: user.role_id,
+      roleName: 'user',
+    }; // Assurez-vous que ces propriétés existent sur l'utilisateur
 
-    // Return the created user
-    // Retourne l'utilisateur créé
-    return user;
+    // Sign the payload to create the JWT token
+    const token = this.jwtService.sign(payload);
+
+    // Return the created user and the token
+    return { user, token };
   }
 
   // Method to retrieve all users with their associated roles.

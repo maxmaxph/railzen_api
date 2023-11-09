@@ -52,9 +52,21 @@ export class AuthService {
     try {
       // Tentative d'enregistrement du nouvel utilisateur dans la base de données
       const createdUser = await this.userRepository.save(user);
+
+      // Create a payload for the JWT token
+      const payload = {
+        email: user.email,
+        userId: user.user_id,
+        roleId: user.role_id,
+        roleName: 'user',
+      }; // Assurez-vous que ces propriétés existent sur l'utilisateur
+
+      // Sign the payload to create the JWT token
+      const accessToken = this.jwtService.sign(payload);
+
       // Suppression du mot de passe du retour pour des raisons de sécurité
       delete createdUser.password;
-      return createdUser;
+      return { createdUser, accessToken };
     } catch (error) {
       // Si l'email existe déjà dans la base de données (erreur 23505)
       if (error.code === '23505') {
