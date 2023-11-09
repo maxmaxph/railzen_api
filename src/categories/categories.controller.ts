@@ -13,7 +13,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { RoleGuard } from 'src/role/role.guard';
+import { RoleGuard } from 'src/guards/role/role.guard';
 @ApiTags('categories')
 @Controller('categories')
 @UseGuards(AuthGuard('jwt'))

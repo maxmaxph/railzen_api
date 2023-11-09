@@ -14,7 +14,7 @@ import { CreateSessionDto } from './dto/create-session.dto';
 import { UpdateSessionDto } from './dto/update-session.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { RoleGuard } from 'src/role/role.guard';
+import { RoleGuard } from 'src/guards/role/role.guard';
 @ApiTags('sessions')
 @Controller('sessions')
 @UseGuards(AuthGuard('jwt'))

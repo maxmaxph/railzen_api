@@ -13,10 +13,10 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { RoleGuard } from 'src/role/role.guard';
+import { RoleGuard } from 'src/guards/role/role.guard';
 @ApiTags('users')
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), new RoleGuard('admin'))
+@UseGuards(AuthGuard('jwt'))
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -26,6 +26,7 @@ export class UsersController {
   }
 
   @Get()
+  @UseGuards(new RoleGuard('admin'))
   findAll() {
     return this.usersService.findAll();
   }

@@ -13,7 +13,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { RoleGuard } from 'src/role/role.guard';
+import { RoleGuard } from 'src/guards/role/role.guard';
 @ApiTags('roles')
 @Controller('roles')
 @UseGuards(AuthGuard('jwt'))
