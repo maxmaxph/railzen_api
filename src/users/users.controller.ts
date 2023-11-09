@@ -14,6 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/guards/role/role.guard';
+import { SelfGuard } from 'src/guards/self/self.guard';
 @ApiTags('users')
 @Controller('users')
 @UseGuards(AuthGuard('jwt'))
@@ -32,16 +33,19 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(SelfGuard)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
   @Patch(':id')
+  @UseGuards(SelfGuard)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
+  @UseGuards(SelfGuard)
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
