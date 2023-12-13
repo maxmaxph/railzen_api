@@ -40,13 +40,13 @@ export class FavoritesController {
     return this.favoritesService.findFavoritesByUserId(userId);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFavoriteDto: UpdateFavoriteDto,
-  ) {
-    return this.favoritesService.update(+id, updateFavoriteDto);
-  }
+  // @Patch(':id')
+  // update(
+  //   @Param('id') id: string,
+  //   @Body() updateFavoriteDto: UpdateFavoriteDto,
+  // ) {
+  //   return this.favoritesService.update(+id, updateFavoriteDto);
+  // }
 
   @Delete('user/:userId/session/:sessionId')
   async removeFavoriteByUserIdAndSessionId(

@@ -1,5 +1,4 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Favorite } from './entities/favorite.entity';
 import { Repository } from 'typeorm';
