@@ -38,4 +38,4 @@ lerna-debug.log*
 .env
 
 # Répertoire de stockage des fichiers téléchargés
-uploads/
+# uploads/
