@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/guards/role/role.guard';
 import { SelfGuard } from 'src/guards/self/self.guard';
+import { ChangePasswordDto } from './dto/change-password.dto';
 @ApiTags('users')
 @Controller('users')
 @UseGuards(AuthGuard('jwt'))
@@ -48,5 +49,12 @@ export class UsersController {
   @UseGuards(SelfGuard)
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+  @Patch('change-password/:userId')
+  async changeUserPassword(
+    @Param('userId') userId: number,
+    @Body() passwordDto: ChangePasswordDto,
+  ) {
+    return this.usersService.updatePassword(userId, passwordDto.newPassword);
   }
 }

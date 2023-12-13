@@ -16,7 +16,6 @@ import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-  // Injection du dépôt de l'entité User pour interagir avec la base de données
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -44,7 +43,7 @@ export class AuthService {
       where: { name: 'user' },
     }); // SELECT * FROM role WHERE role = 'user'
     if (!defaultRole) {
-      throw new NotFoundException('Default role not found');
+      throw new NotFoundException('Rôle par défaut non trouvé');
     }
     user.date_in = new Date(); // set date_in
     user.role_id = defaultRole.role_id; // set default role
@@ -59,9 +58,8 @@ export class AuthService {
         userId: user.user_id,
         roleId: user.role_id,
         roleName: 'user',
-      }; // Assurez-vous que ces propriétés existent sur l'utilisateur
+      };
 
-      // Sign the payload to create the JWT token
       const accessToken = this.jwtService.sign(payload);
 
       // Suppression du mot de passe du retour pour des raisons de sécurité
@@ -70,7 +68,7 @@ export class AuthService {
     } catch (error) {
       // Si l'email existe déjà dans la base de données (erreur 23505)
       if (error.code === '23505') {
-        throw new ConflictException('email already exists');
+        throw new ConflictException('Adresse déjà enregistrée');
       } else {
         // Si une autre erreur se produit
         throw new InternalServerErrorException();
@@ -86,19 +84,19 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException('Utilisateur introuvable');
     }
 
     const userId = user.user_id;
     const roleId = user.role_id;
-    const roleName = user.role.name; // Récupérez le nom du rôle depuis l'entité User
+    const roleName = user.role.name; // Récupére le nom du rôle depuis l'entité User
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const payload = { email, userId, roleId, roleName }; // Ajoutez le roleName dans le payload
+      const payload = { email, userId, roleId, roleName };
       const accessToken = await this.jwtService.sign(payload);
       return { accessToken };
     } else {
-      throw new UnauthorizedException('Credentials not found');
+      throw new UnauthorizedException('Mot de passe érroné');
     }
   }
 }

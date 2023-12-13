@@ -6,10 +6,8 @@ import { Category } from 'src/categories/entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-// Decorator indicating that this class is an injectable service
 @Injectable() // Décorateur indiquant que cette classe est un service injectable
 export class SessionsService {
-  // Injection of repositories for Session and Category entities
   // Injection des dépôts (repositories) pour les entités Session et Category
   constructor(
     @InjectRepository(Session)
@@ -32,13 +30,11 @@ export class SessionsService {
     return this.sessionRepository.save(session);
   }
 
-  // Method to retrieve all sessions
   // Méthode pour récupérer toutes les sessions
   async findAll() {
     return await this.sessionRepository.find();
   }
 
-  // Asynchronous method to retrieve a session by its ID
   // Méthode asynchrone pour récupérer une session par son ID
   async findOne(id: number) {
     const found = await this.sessionRepository.findOneBy({ session_id: id });
@@ -49,7 +45,7 @@ export class SessionsService {
     }
     return found;
   }
-  // Asynchronous method to find sessions by her categories
+
   // Méthode asynchrone pour trouver les sessions par leurs catégories
   async findSessionsByCategory(categoryId: number) {
     const category = await this.categoryRepository.findOneBy({
@@ -63,7 +59,7 @@ export class SessionsService {
       relations: ['category'],
     });
   }
-  // Asynchronous method to update a session by its ID
+
   // Méthode asynchrone pour mettre à jour une session par son ID
   async update(id: number, updateSessionDto: UpdateSessionDto) {
     const sessionToUpdate = await this.findOne(id);
@@ -75,7 +71,6 @@ export class SessionsService {
     return this.sessionRepository.save(sessionToUpdate);
   }
 
-  // Asynchronous method to remove a session by its ID
   // Méthode asynchrone pour supprimer une session par son ID
   async remove(id: number) {
     const sessionToRemove = await this.findOne(id);

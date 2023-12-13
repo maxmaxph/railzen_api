@@ -13,4 +13,7 @@ export const multerConfig = {
       return cb(null, `${randomName}${extname(file.originalname)}`);
     },
   }),
+  limits: {
+    fileSize: 10, // Limite de taille du fichier à 5MB
+  },
 };

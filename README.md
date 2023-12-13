@@ -263,6 +263,7 @@ nest generate res roles
 nest generate res sessions
 nest generate res favorites
 nest generate res categories
+nest generate rest medias
 ```
 
 les opérations de CRUD vont etre générés automatiquements pour chaques ressources.  

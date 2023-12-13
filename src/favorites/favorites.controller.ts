@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 @ApiTags('favorites')
 @Controller('favorites')
 @UseGuards(AuthGuard('jwt'))
@@ -49,10 +52,18 @@ export class FavoritesController {
   async removeFavoriteByUserIdAndSessionId(
     @Param('userId') userId: number,
     @Param('sessionId') sessionId: number,
+    @Res() res: Response,
   ) {
-    return this.favoritesService.removeFavoriteByUserIdAndSessionId(
-      userId,
-      sessionId,
-    );
+    try {
+      await this.favoritesService.removeFavoriteByUserIdAndSessionId(
+        userId,
+        sessionId,
+      );
+      res
+        .status(HttpStatus.OK)
+        .json({ message: 'Favorite removed successfully' });
+    } catch (error) {
+      res.status(HttpStatus.NOT_FOUND).json({ message: error.message });
+    }
   }
 }

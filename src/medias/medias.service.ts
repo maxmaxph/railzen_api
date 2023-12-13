@@ -10,6 +10,7 @@ export class MediasService {
   constructor(
     @InjectRepository(Media) private mediaRepository: Repository<Media>,
   ) {}
+  //méthode pour crér un média
   create(media: Express.Multer.File, userId: number) {
     console.log('le média : ' + media.filename);
     return this.mediaRepository.save({
@@ -19,11 +20,11 @@ export class MediasService {
       user: { user_id: userId },
     });
   }
-
+  // méthode pour récupérer tous les médias
   async getAllMedia(): Promise<Media[]> {
     return this.mediaRepository.find();
   }
-
+  // méthode pour récupérer tous les médias par leur ID
   async getMediaById(id: number, res): Promise<StreamableFile> {
     const result = await this.mediaRepository.findOneBy({ media_id: id });
     if (!result) {
@@ -35,9 +36,5 @@ export class MediasService {
     res.set('Content-Type', result.mimetype);
 
     return new StreamableFile(mediaFile);
-  }
-
-  findAll() {
-    return `This action returns all medias`;
   }
 }

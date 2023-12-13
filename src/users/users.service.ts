@@ -7,10 +7,10 @@ import { Role } from 'src/roles/entities/role.entity';
 import { User } from './entities/user.entity';
 import jwt from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
-@Injectable() // Decorator indicating that this class is an injectable service
+import * as bcrypt from 'bcrypt';
+
 @Injectable() // Décorateur indiquant que cette classe est un service injectable
 export class UsersService {
-  // Injection of repositories for User and Role entities
   // Injection des dépôts (repositories) pour les entités User et Role
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
@@ -18,34 +18,27 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
-  // Asynchronous method to create a new user
   // Méthode asynchrone pour créer un nouvel utilisateur
   async create(createUserDto: CreateUserDto) {
-    // Create a new user instance from the received DTO
     // Crée une nouvelle instance d'utilisateur à partir du DTO reçu
     const newUser = this.userRepository.create(createUserDto);
 
-    // Search for the default role with the name 'user'
     // Recherche le rôle par défaut avec le nom 'user'
     const defaultRole = await this.roleRepository.findOne({
       where: { name: 'user' },
     });
 
-    // If the default role is not found, throw an exception
     // Si le rôle par défaut n'est pas trouvé, lance une exception
     if (!defaultRole) {
       throw new NotFoundException('Default role not found');
     }
 
-    // Set the user's registration date to the current date
     // Définit la date d'inscription de l'utilisateur à la date actuelle
     newUser.date_in = new Date();
 
-    // Assign the ID of the default role to the user
     // Attribue l'ID du rôle par défaut à l'utilisateur
     newUser.role_id = defaultRole.role_id;
 
-    // Save the new user in the database
     // Sauvegarde le nouvel utilisateur dans la base de données
     const user = await this.userRepository.save(newUser);
     // Create a payload for the JWT token
@@ -54,16 +47,15 @@ export class UsersService {
       userId: user.user_id,
       roleId: user.role_id,
       roleName: 'user',
-    }; // Assurez-vous que ces propriétés existent sur l'utilisateur
+    };
 
-    // Sign the payload to create the JWT token
+    //Signature du playload pour créer le JWT
     const token = this.jwtService.sign(payload);
 
     // Return the created user and the token
     return { user, token };
   }
 
-  // Method to retrieve all users with their associated roles.
   // Méthode pour récupérer tous les utilisateurs avec leurs rôles associés.
   async findAll() {
     // Search for all users with their associated role.
@@ -76,7 +68,6 @@ export class UsersService {
     return user;
   }
 
-  // Asynchronous method to retrieve a user by its ID
   // Méthode asynchrone pour récupérer un utilisateur par son ID
   async findOne(id: number) {
     // Search for the user by its ID
@@ -123,7 +114,6 @@ export class UsersService {
     return userToUpdate;
   }
 
-  // Asynchronous method to remove a user by its ID
   // Méthode asynchrone pour supprimer un utilisateur par son ID
   async remove(id: number) {
     const userToRemove = await this.findOne(id);
@@ -164,5 +154,13 @@ export class UsersService {
         }
       }
     });
+  }
+
+  async updatePassword(userId: number, newPassword: string): Promise<User> {
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await this.userRepository.update(userId, { password: hashedPassword });
+    return this.userRepository.findOne({ where: { user_id: userId } });
   }
 }

@@ -20,7 +20,7 @@ export class RoleGuard implements CanActivate {
       throw new ForbiddenException("Vous n'êtes pas connecté");
     }
 
-    // Vérifiez si l'utilisateur a une propriété 'role' et si cette propriété a une sous-propriété 'name'
+    // je verifie si l'utilisateur a une propriété 'role' et si cette propriété a une sous-propriété 'name'
     if (!user.role || !user.role.name || user.role.name !== this.roleName) {
       throw new ForbiddenException("Vous n'avez pas les droits nécessaires");
     }
