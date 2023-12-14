@@ -31,7 +31,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const corsOptions: CorsOptions = {
-    origin: 'http://localhost:4200',
+    origin: 'https://maxime-lenfant.fr',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true,
