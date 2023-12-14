@@ -20,11 +20,10 @@ import { RoleGuard } from 'src/guards/role/role.guard';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
   @UseGuards(new RoleGuard('admin'))
-  @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.rolesService.create(createRoleDto);
-  }
-
+  // @Post()
+  // create(@Body() createRoleDto: CreateRoleDto) {
+  //   return this.rolesService.create(createRoleDto);
+  // }
   @Get()
   findAll() {
     return this.rolesService.findAll();
@@ -34,14 +33,14 @@ export class RolesController {
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(+id);
   }
-  @UseGuards(new RoleGuard('admin'))
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.rolesService.update(+id, updateRoleDto);
-  }
-  @UseGuards(new RoleGuard('admin'))
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.rolesService.remove(+id);
-  }
+  // @UseGuards(new RoleGuard('admin'))
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
+  //   return this.rolesService.update(+id, updateRoleDto);
+  // }
+  // @UseGuards(new RoleGuard('admin'))
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.rolesService.remove(+id);
+  // }
 }
